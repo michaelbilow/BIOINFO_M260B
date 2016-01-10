@@ -66,9 +66,9 @@ def trivial_algorithm(paired_end_reads, ref):
             remaining_time = time_passed/count*(len(paired_end_reads)-count)
             print 'Approximately {:.2} minutes remaining'.format(remaining_time)
         for read in read_pair:
-            min_mismatches = 100
+            min_mismatches = len(read) + 1
             min_mismatch_location = -1
-            for i in range(len(ref) - 50):
+            for i in range(len(ref) - len(read)):
                 mismatches = [1 if read[j] != ref[i + j] else 0 for j in range(len(read))]
                 n_mismatches = sum(mismatches)
                 # The above line should be familiar to Python users, but bears  some explanation for
@@ -176,7 +176,7 @@ if __name__ == "__main__":
     f_base = '{}_chr_1'.format(folder)
     reads_fn = join(folder, 'reads_{}.txt'.format(f_base))
     start = time.clock()
-    input_reads = read_reads(reads_fn)[:300]
+    input_reads = read_reads(reads_fn)[:100]
     # This is for speed;
     # If you want to read everything
     # remove the [:300] part of the above line.
