@@ -64,7 +64,7 @@ def trivial_algorithm(paired_end_reads, ref):
             time_passed = (time.clock()-start)/60
             print '{} reads aligned'.format(count), 'in {:.3} minutes'.format(time_passed)
             remaining_time = time_passed/count*(len(paired_end_reads)-count)
-            print 'Approximately {:.2} minutes remaining'.format(remaining_time)
+            print 'Approximately {:.3} minutes remaining'.format(remaining_time)
         for read in read_pair:
             min_mismatches = len(read) + 1
             min_mismatch_location = -1
@@ -172,11 +172,11 @@ def pretty_print_aligned_reads_with_ref(genome_oriented_reads, read_alignments, 
 
 
 if __name__ == "__main__":
-    folder = 'practice_W_1'
+    folder = 'hw1_W_2'
     f_base = '{}_chr_1'.format(folder)
     reads_fn = join(folder, 'reads_{}.txt'.format(f_base))
     start = time.clock()
-    input_reads = read_reads(reads_fn)[:100]
+    input_reads = read_reads(reads_fn)
     # This is for speed;
     # If you want to read everything
     # remove the [:300] part of the above line.
