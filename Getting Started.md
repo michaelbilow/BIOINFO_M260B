@@ -31,3 +31,18 @@ SourceTree software to set up git on your machine.
 Once you have all of that, you can use the git clone command either from the
 Terminal (on Mac or Linux) or from the git terminal provided by SourceTree
 to download the course materials.
+
+## Tutorials for Beginners
+
+### Python
+Codecademy's Python course is solid and provides a fast introduction to the language.
+
+### Git
+
+
+### PyCharm
+
+### Debugging
+
+### Anaconda Installation/Conda
+

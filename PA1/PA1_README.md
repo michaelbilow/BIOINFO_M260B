@@ -15,3 +15,12 @@ The reference and reads are the inputs to *basic_aligner.py*, which are converte
 The aligned data is fed into the *basic_pileup.py* script, which generates a consensus sequence by picking the most common base at each position.  That "consensus" file is the heart of this assignment; it has the reference, the aligned reads, and then an asterisk at every position where the consensus sequence differs from the reference. If you can understand what is going on there, you'll understand what you can change to improve mapping true SNPs, and then go on to mapping structural variations.
 
 The *basic_pileup.py* script also makes a file that starts snps that is used to format the output properly.  It notes all of the differences between the consensus and the reference and notes the position where they occur. It also zips that file so you can sumbit it directly to the course site.
+
+## What You Should Change
+
+
+## If you need more help
+
+### Thinking about the biology
+
+.1% of your genome is SNPs;
