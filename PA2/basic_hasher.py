@@ -73,7 +73,7 @@ if __name__ == "__main__":
     reads_fn = join(folder, 'reads_{}.txt'.format(f_base))
     import time
     start_time = time.clock()
-    reference_fn = join(folder, 'ref_{}.txt')
+    reference_fn = join(folder, 'ref_{}.txt'.format(f_base))
     genome_hash = build_hash_and_pickle(reference_fn, key_length=4)
     # Pickle allows python objects (like this hash table)
     # to be saved to disk. This allows them to be reloaded,
