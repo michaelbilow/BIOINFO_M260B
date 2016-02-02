@@ -3,7 +3,7 @@ import numpy as np
 from collections import defaultdict
 import time
 from os.path import join
-from basic_hasher import build_hash_and_pickle, hash_read
+from basic_hasher import build_hash_and_pickle, hashing_algorithm
 from helpers.helpers import *
 
 READ_LENGTH = 50
@@ -30,7 +30,7 @@ def generate_pileup(aligned_fn):
                 new_changes = process_lines(lines_to_process)
                 lines_to_process = []
                 changes += new_changes
-                print time.clock() - start, 'seconds'
+                # print time.clock() - start, 'seconds'
             else:
                 lines_to_process.append(line)
     snps = [v for v in changes if v[0] == 'SNP']
@@ -105,9 +105,10 @@ def generate_donor(ref, aligned_reads):
     :param aligned_reads: reads aligned to the genome (with pre-pended spaces to offset correctly)
     :return: hypothesized donor genome
     """
-
+    print aligned_reads
+    cleaned_aligned_reads = [_.replace('.', ' ') for _ in aligned_reads]
     ## Start by appending spaces to the reads so they line up with the reference correctly.
-    padded_reads = [aligned_read + ' ' * (len(ref) - len(aligned_read)) for aligned_read in aligned_reads]
+    padded_reads = [aligned_read + ' ' * (len(ref) - len(aligned_read)) for aligned_read in cleaned_aligned_reads]
     consensus_string = consensus(ref, aligned_reads)
 
     ## Seed the donor by choosing the read that best aligns to the reference.
@@ -282,34 +283,30 @@ def consensus(ref, aligned_reads):
 
 
 if __name__ == "__main__":
-    input_folder = './PA 2'
-    chr_name = 'hw2undergrad_E_2_chr_1'
+    genome_name = 'practice_W_1'
+    input_folder = './PA2/{}'.format(genome_name)
+    chr_name = '{}_chr_1'.format(genome_name)
     reads_fn_end = 'reads_{}.txt'.format(chr_name)
     reads_fn = join(input_folder, reads_fn_end)
     ref_fn_end = 'ref_{}.txt'.format(chr_name)
     ref_fn = join(input_folder, ref_fn_end)
     key_length = 4
     start = time.clock()
-    reads = read_reads(reads_fn)
+    reads = read_reads(reads_fn)[:500]
     # If you want to speed it up, cut down the number of reads by
     # changing the line to reads = read_reads(reads_fn)[:<x>] where <x>
     # is the number of reads you want to work with.
     genome_hash_table = build_hash_and_pickle(ref_fn, key_length)
     reference = read_reference(ref_fn)
-    alignments = []
-    count = 0
-    for read in reads:
-        alignment = hash_read(read, genome_hash_table)
-        alignments.append(alignment)
-        count += 1
-        if count % 100 == 0:
-            print count, time.clock() - start
+    genome_aligned_reads, alignments = hashing_algorithm(reads, genome_hash_table)
+    # print genome_aligned_reads
+    # print alignments
+    output_str = pretty_print_aligned_reads_with_ref(genome_aligned_reads, alignments, reference)
+    # print output_str[:5000]
 
-    output_str = pretty_print_aligned_reads_with_ref(reads, alignments, reference)
     output_fn = join(input_folder, 'aligned_reads_{}.txt'.format(chr_name))
     with(open(output_fn, 'w')) as output_file:
         output_file.write(output_str)
-    print time.clock() - start, 'seconds'
 
     input_fn = join(input_folder, 'aligned_reads_{}.txt'.format(chr_name))
     snps, insertions, deletions = generate_pileup(input_fn)

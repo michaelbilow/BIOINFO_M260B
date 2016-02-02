@@ -2,6 +2,42 @@ from collections import defaultdict, Counter
 from helpers.helpers import *
 import cPickle as pickle
 from os.path import join, exists, splitext
+import time
+
+
+def hash_end(end, genome_ht):
+    """
+    Uses hashing to identify the set of locations spanned by
+    a read.
+
+    :param end: A single end of a read
+    :param genome_ht: A hash of the genome with uniform key length
+    :return:
+    """
+    key_length = len(genome_ht.keys()[0])
+    end_pieces = [end[i * key_length: (i + 1) * key_length]
+                  for i in range(len(end) / key_length)]
+
+    hashed_read_locations = [genome_ht[read_piece]
+                             for read_piece in end_pieces]
+    start_positions = [[x - i * key_length for x in hashed_read_locations[i]]
+                       for i in range(len(hashed_read_locations))]
+    start_counter = Counter()
+
+    for position_list in start_positions:
+        start_counter.update(position_list)
+
+    if not start_counter:
+        return -1, 0
+    else:
+        best_alignment_location, best_alignment_count = \
+            start_counter.most_common(1)[0]
+
+    if best_alignment_count < 2:
+        return -1, best_alignment_count
+    else:
+        return best_alignment_location, best_alignment_count
+
 
 def hash_read(read, genome_ht):
     """
@@ -12,32 +48,24 @@ def hash_read(read, genome_ht):
     :param genome_ht: A hash of the genome with uniform key length
     :return:
     """
-    key_length = len(genome_ht.keys()[0])
-    read_pieces = [read[i * key_length: (i + 1) * key_length]
-                   for i in range(len(read) / key_length)]
 
-    hashed_read_locations = [genome_ht[read_piece]
-                             for read_piece in read_pieces]
-    start_positions = [[x - i * key_length for x in hashed_read_locations[i]]
-                       for i in range(len(hashed_read_locations))]
-    start_counter = Counter()
+    oriented_reads = [(read[0][::i], read[1][::j]) for i, j in ((1, -1), (-1, 1))]
+    ## Either one end is forward and the other end is reversed, or vice versa.
 
-    for position_list in start_positions:
-        start_counter.update(position_list)
-
-    if not start_counter:
-        return -1
-    else:
-        best_alignment_location, best_alignment_count = \
-            start_counter.most_common(1)[0]
-
-    if best_alignment_count < 2:
-        return -1
-    else:
-        return best_alignment_location
+    best_score = -1
+    best_alignment_locations = (-1, -1)
+    best_oriented_read = ('', '')
+    for oriented_read in oriented_reads:
+        hash_results = [hash_end(_, genome_ht) for _ in oriented_read]
+        hash_locations = [_[0] for _ in hash_results]
+        hash_score = sum([_[1] for _ in hash_results])
+        if hash_score > best_score:
+            best_alignment_locations = hash_locations
+            best_oriented_read = oriented_read
+    return best_oriented_read, best_alignment_locations
 
 
-def hash_genome(reference, key_length):
+def make_genome_hash(reference, key_length):
     """
 
     :param reference: The reference as a string stored
@@ -62,30 +90,47 @@ def build_hash_and_pickle(ref_fn, key_length, force_rebuild=False):
     else:
         pass
     reference = read_reference(ref_fn)
-    ref_genome_hash = hash_genome(reference, key_length)
+    ref_genome_hash = make_genome_hash(reference, key_length)
     pickle.dump(ref_genome_hash, open(reference_hash_pkl_fn, 'wb'))
     return ref_genome_hash
 
 
+def hashing_algorithm(paired_end_reads, genome_ht):
+    alignments = []
+    genome_aligned_reads = []
+    count = 0
+    start = time.clock()
+
+    for read in paired_end_reads:
+        alignment, genome_aligned_read = hash_read(read, genome_ht)
+        alignments.append(alignment)
+        genome_aligned_reads.append(genome_aligned_read)
+        count += 1
+        if count % 100 == 0:
+            time_passed = (time.clock()-start)/60
+            print '{} reads aligned'.format(count), 'in {:.3} minutes'.format(time_passed)
+            remaining_time = time_passed/count*(len(paired_end_reads)-count)
+            print 'Approximately {:.3} minutes remaining'.format(remaining_time)
+    return alignments, genome_aligned_reads
+
 if __name__ == "__main__":
-    folder = 'hw1_W_2'
-    f_base = '{}_chr_1'.format(folder)
-    reads_fn = join(folder, 'reads_{}.txt'.format(f_base))
-    import time
-    start_time = time.clock()
-    reference_fn = join(folder, 'ref_{}.txt'.format(f_base))
-    genome_hash = build_hash_and_pickle(reference_fn, key_length=4)
-    # Pickle allows python objects (like this hash table)
-    # to be saved to disk. This allows them to be reloaded,
-    # rather than rebuilt every time you run the program.
-    # If you want to reload your file, COMMENT OUT THE hash_genome line
-    # and use the following line:
-    # reference_hash = pickle.load(open(reference_pkl_fn,'rb'))
-
-    print time.clock() - start_time
-
-    print sum([len(genome_hash[k]) for k in genome_hash])
-
-    # for k in genome_hash:
-    #     print k, genome_hash[k]
-    ## Read this output--you can start identifying STRs using this data.
+    genome_name = 'practice_W_1'
+    input_folder = './{}'.format(genome_name)
+    chr_name = '{}_chr_1'.format(genome_name)
+    reads_fn_end = 'reads_{}.txt'.format(chr_name)
+    reads_fn = join(input_folder, reads_fn_end)
+    ref_fn_end = 'ref_{}.txt'.format(chr_name)
+    ref_fn = join(input_folder, ref_fn_end)
+    key_length = 4
+    start = time.clock()
+    reads = read_reads(reads_fn)
+    # If you want to speed it up, cut down the number of reads by
+    # changing the line to reads = read_reads(reads_fn)[:<x>] where <x>
+    # is the number of reads you want to work with.
+    genome_hash_table = build_hash_and_pickle(ref_fn, key_length)
+    ref = read_reference(ref_fn)
+    genome_aligned_reads, alignments = hashing_algorithm(reads, genome_hash_table)
+    print genome_aligned_reads
+    print alignments
+    output_str = pretty_print_aligned_reads_with_ref(genome_aligned_reads, alignments, ref)
+    print output_str[:5000]
