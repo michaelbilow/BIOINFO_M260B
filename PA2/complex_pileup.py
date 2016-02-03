@@ -105,7 +105,6 @@ def generate_donor(ref, aligned_reads):
     :param aligned_reads: reads aligned to the genome (with pre-pended spaces to offset correctly)
     :return: hypothesized donor genome
     """
-    print aligned_reads
     cleaned_aligned_reads = [_.replace('.', ' ') for _ in aligned_reads]
     ## Start by appending spaces to the reads so they line up with the reference correctly.
     padded_reads = [aligned_read + ' ' * (len(ref) - len(aligned_read)) for aligned_read in cleaned_aligned_reads]
@@ -283,7 +282,7 @@ def consensus(ref, aligned_reads):
 
 
 if __name__ == "__main__":
-    genome_name = 'practice_W_1'
+    genome_name = 'hw2undergrad_E_2'
     input_folder = './PA2/{}'.format(genome_name)
     chr_name = '{}_chr_1'.format(genome_name)
     reads_fn_end = 'reads_{}.txt'.format(chr_name)
@@ -292,7 +291,7 @@ if __name__ == "__main__":
     ref_fn = join(input_folder, ref_fn_end)
     key_length = 4
     start = time.clock()
-    reads = read_reads(reads_fn)[:500]
+    reads = read_reads(reads_fn)
     # If you want to speed it up, cut down the number of reads by
     # changing the line to reads = read_reads(reads_fn)[:<x>] where <x>
     # is the number of reads you want to work with.

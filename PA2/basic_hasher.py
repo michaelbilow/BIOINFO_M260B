@@ -80,7 +80,7 @@ def make_genome_hash(reference, key_length):
 
 
 def build_hash_and_pickle(ref_fn, key_length, force_rebuild=False):
-    reference_hash_pkl_fn = '{}_hash.pkl'.format(splitext(ref_fn)[0])
+    reference_hash_pkl_fn = '{}_hash_keylength_{}.pkl'.format(splitext(ref_fn)[0], key_length)
     if exists(reference_hash_pkl_fn) and not force_rebuild:
         ref_genome_hash = pickle.load(open(reference_hash_pkl_fn, 'rb'))
         if len(ref_genome_hash.keys()[0]) == key_length:
