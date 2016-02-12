@@ -121,7 +121,7 @@ if __name__ == "__main__":
     reads_fn = join(input_folder, reads_fn_end)
     ref_fn_end = 'ref_{}.txt'.format(chr_name)
     ref_fn = join(input_folder, ref_fn_end)
-    key_length = 4
+    key_length = 7
     start = time.clock()
     reads = read_reads(reads_fn)
     # If you want to speed it up, cut down the number of reads by
@@ -130,7 +130,7 @@ if __name__ == "__main__":
     genome_hash_table = build_hash_and_pickle(ref_fn, key_length)
     ref = read_reference(ref_fn)
     genome_aligned_reads, alignments = hashing_algorithm(reads, genome_hash_table)
-    print genome_aligned_reads
-    print alignments
+    # print genome_aligned_reads
+    # print alignments
     output_str = pretty_print_aligned_reads_with_ref(genome_aligned_reads, alignments, ref)
     print output_str[:5000]
