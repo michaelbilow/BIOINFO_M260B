@@ -189,6 +189,7 @@ def identify_changes(ref, donor, offset):
     ref = '${}'.format(ref)
     donor = '${}'.format(donor)
     edit_matrix = edit_distance_matrix(ref=ref, donor=donor)
+    print edit_matrix
     current_row = len(ref) - 1
     current_column = len(donor) - 1
     changes = []
@@ -283,35 +284,36 @@ def consensus(ref, aligned_reads):
 
 if __name__ == "__main__":
 
-    ### Testing code for Smith-Waterman Algorithm
-
-    identify_changes(ref='ACACCC', donor='ATACCCGGG', offset=0)
-    identify_changes(ref='ATACCCGGG', donor='ACACCC', offset=0)
-    identify_changes(ref='ACACCC', donor='GGGATACCC', offset=0)
-    identify_changes(ref='ACA', donor='AGA', offset=0)
-    identify_changes(ref='ACA', donor='ACGTA', offset=0)
-    identify_changes(ref='TTACCGTGCAAGCG', donor='GCACCCAAGTTCG', offset=0)
-
-    ### /Testing Code
-
-    genome_name = 'hw2undergrad_E_2'
-    input_folder = './PA2/{}'.format(genome_name)
-    chr_name = '{}_chr_1'.format(genome_name)
-    reads_fn_end = 'reads_{}.txt'.format(chr_name)
-    reads_fn = join(input_folder, reads_fn_end)
-    ref_fn_end = 'ref_{}.txt'.format(chr_name)
-    ref_fn = join(input_folder, ref_fn_end)
-    start = time.clock()
-    input_fn = join(input_folder, 'aligned_reads_{}.txt'.format(chr_name))
-    snps, insertions, deletions = generate_pileup(input_fn)
-    output_fn = join(input_folder, 'changes_{}.txt'.format(chr_name))
-    with open(output_fn, 'w') as output_file:
-        output_file.write('>' + chr_name + '\n>SNP\n')
-        for x in snps:
-            output_file.write(','.join([str(u) for u in x[1:]]) + '\n')
-        output_file.write('>INS\n')
-        for x in insertions:
-            output_file.write(','.join([str(u) for u in x[1:]]) + '\n')
-        output_file.write('>DEL\n')
-        for x in deletions:
-            output_file.write(','.join([str(u) for u in x[1:]]) + '\n')
+    # print edit_distance_matrix('$PRETTY', '$PRTTEIN')
+    identify_changes('PRETTY', 'PRTTEIN', offset=0)
+    # ### Testing code for Smith-Waterman Algorithm
+    #
+    # identify_changes(ref='ACACCC', donor='ATACCCGGG', offset=0)
+    # identify_changes(ref='ATACCCGGG', donor='ACACCC', offset=0)
+    # identify_changes(ref='ACACCC', donor='GGGATACCC', offset=0)
+    # identify_changes(ref='ACA', donor='AGA', offset=0)
+    # identify_changes(ref='ACA', donor='ACGTA', offset=0)
+    # identify_changes(ref='TTACCGTGCAAGCG', donor='GCACCCAAGTTCG', offset=0)
+    # ### /Testing Code
+    #
+    # genome_name = 'hw2undergrad_E_2'
+    # input_folder = './PA2/{}'.format(genome_name)
+    # chr_name = '{}_chr_1'.format(genome_name)
+    # reads_fn_end = 'reads_{}.txt'.format(chr_name)
+    # reads_fn = join(input_folder, reads_fn_end)
+    # ref_fn_end = 'ref_{}.txt'.format(chr_name)
+    # ref_fn = join(input_folder, ref_fn_end)
+    # start = time.clock()
+    # input_fn = join(input_folder, 'aligned_reads_{}.txt'.format(chr_name))
+    # snps, insertions, deletions = generate_pileup(input_fn)
+    # output_fn = join(input_folder, 'changes_{}.txt'.format(chr_name))
+    # with open(output_fn, 'w') as output_file:
+    #     output_file.write('>' + chr_name + '\n>SNP\n')
+    #     for x in snps:
+    #         output_file.write(','.join([str(u) for u in x[1:]]) + '\n')
+    #     output_file.write('>INS\n')
+    #     for x in insertions:
+    #         output_file.write(','.join([str(u) for u in x[1:]]) + '\n')
+    #     output_file.write('>DEL\n')
+    #     for x in deletions:
+    #         output_file.write(','.join([str(u) for u in x[1:]]) + '\n')
