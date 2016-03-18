@@ -172,16 +172,17 @@ def pretty_print_aligned_reads_with_ref(genome_oriented_reads, read_alignments, 
 
 
 if __name__ == "__main__":
-    folder = 'hw1_W_2'
-    f_base = '{}_chr_1'.format(folder)
-    reads_fn = join(folder, 'reads_{}.txt'.format(f_base))
+    data_folder = 'hw1_W_2'
+    input_folder = join('../data/', data_folder)
+    f_base = '{}_chr_1'.format(data_folder)
+    reads_fn = join(input_folder, 'reads_{}.txt'.format(f_base))
     start = time.clock()
-    input_reads = read_reads(reads_fn)
+    input_reads = read_reads(reads_fn)[:10]
     # This is for speed;
     # If you want to read everything
     # remove the [:300] part of the above line.
 
-    reference_fn = join(folder, 'ref_{}.txt'.format(f_base))
+    reference_fn = join(input_folder, 'ref_{}.txt'.format(f_base))
     reference = read_reference(reference_fn)
     # donor_fn = join(folder, 'donor_{}'.format(f_base))
     # donor = read_reference(donor_fn)
@@ -189,7 +190,7 @@ if __name__ == "__main__":
     print alignments
     print reads
     output_str = pretty_print_aligned_reads_with_ref(reads, alignments, reference)
-    output_fn = join(folder, 'aligned_{}.txt'.format(f_base))
+    output_fn = join(input_folder, 'aligned_{}.txt'.format(f_base))
     # print output_fn
     with(open(output_fn, 'w')) as output_file:
         output_file.write(output_str)
