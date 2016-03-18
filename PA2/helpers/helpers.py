@@ -64,20 +64,22 @@ def pretty_print_aligned_reads_with_ref(genome_oriented_reads, read_alignments, 
 
     first_alignment = [x[0] for x in best_alignments]
     alignment_indices = np.argsort(first_alignment)
-    sorted_reads = [aligned_reads[i] for i in alignment_indices]
-    sorted_alignments = [best_alignments[i] for i in alignment_indices]
+    sorted_reads = np.array([aligned_reads[i] for i in alignment_indices])
+    sorted_alignments = np.array([best_alignments[i] for i in alignment_indices])
 
     # You don't need to worry too much about how the code block below works--its job is to make it so
     # that a read that starts printing in the third row will continue printing in the third row of the
     # next set of lines.
     active_reads = []
     output_str += '\n\n' + '-' * (line_length + 6) + '\n\n'
+    read_indices = np.array([sorted_alignments[j][0]/line_length for j in range(len(sorted_alignments))])
+
     for i in range(len(ref) / line_length):
         next_ref = ref[i * line_length: (i + 1) * line_length]
-        new_read_indices = [j for j in range(len(sorted_reads))
-                            if i * line_length <= sorted_alignments[j][0] < (i + 1) * line_length]
-        space_amounts = [sorted_alignments[index][0] % line_length for index in new_read_indices]
-        new_reads = [sorted_reads[index] for index in new_read_indices]
+        read_mask = (read_indices == i)
+        new_alignments = sorted_alignments[read_mask]
+        new_reads = sorted_reads[read_mask]
+        space_amounts = [_[0] % line_length for _ in new_alignments]
         new_reads_with_spaces = [' ' * space_amounts[j] + new_reads[j] for j in range(len(new_reads))]
         empty_active_read_indices = [index for index in range(len(active_reads)) if active_reads[index] == '']
         for j in range(min(len(new_reads_with_spaces), len(empty_active_read_indices))):

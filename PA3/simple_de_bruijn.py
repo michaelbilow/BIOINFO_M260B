@@ -15,9 +15,11 @@ def read_reads(read_fn):
             # only contains the name of the chromosome the reads
             # came from.
         line = line.strip()
-        read = line.split(',')[0]  # Only take the first read.
+        reads = line.split(',')
+        # Only take the first read.
         # Clearly, there is room for improvement here.
-        all_reads.append(read)
+        # Remember, the reads may be reversed. other end of the read is reversed relative ot the first.
+        all_reads += reads
     return all_reads
 
 
