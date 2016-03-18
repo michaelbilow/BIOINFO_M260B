@@ -31,7 +31,7 @@ def trivial_algorithm(paired_end_reads, ref):
         count += 1
         read_alignment_locations = []
         output_read_pair = []
-        if count % 20 == 0:
+        if count % 10 == 0:
             time_passed = (time.clock()-start)/60
             print '{} reads aligned'.format(count), 'in {:.3} minutes'.format(time_passed)
             remaining_time = time_passed/count*(len(paired_end_reads)-count)
@@ -81,19 +81,18 @@ if __name__ == "__main__":
     reads_fn = join(input_folder, 'reads_{}.txt'.format(f_base))
     start = time.clock()
     input_reads = read_reads(reads_fn)
-    # This is for speed;
-    # If you want to read everything
-    # remove the [:300] part of the above line.
+    # This will take a while; you can use an array slice for example:
+    #
+    #   input_reads = reads[:300]
+    #
+    # to generate some data quickly.
 
     reference_fn = join(input_folder, 'ref_{}.txt'.format(f_base))
     reference = read_reference(reference_fn)
-    # donor_fn = join(folder, 'donor_{}'.format(f_base))
-    # donor = read_reference(donor_fn)
     alignments, reads = trivial_algorithm(input_reads, reference)
     print alignments
     print reads
     output_str = pretty_print_aligned_reads_with_ref(reads, alignments, reference)
     output_fn = join(input_folder, 'aligned_{}.txt'.format(f_base))
-    # print output_fn
     with(open(output_fn, 'w')) as output_file:
         output_file.write(output_str)
