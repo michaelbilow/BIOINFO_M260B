@@ -3,19 +3,7 @@ from os.path import join
 import zipfile
 import time
 from collections import defaultdict
-
-
-def read_reference(ref_fn):
-    f = open(ref_fn, 'r')
-    first_line = True
-    output_reference = ''
-    for line in f:
-        if first_line:
-            first_line = False
-            continue
-        line = line.strip()
-        output_reference += line
-    return output_reference
+from CM124.helpers import read_reference, read_reads
 
 
 def make_STR_dicts(ref):

@@ -2,7 +2,7 @@ from os.path import join
 import sys
 import time
 from collections import defaultdict, Counter
-from TA.helpers.helpers import read_reads
+from M260B.helpers import read_reads
 
 
 def read_assembly_reads(read_fn):

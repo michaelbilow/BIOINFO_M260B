@@ -2,7 +2,7 @@ from collections import defaultdict, Counter
 import cPickle as pickle
 from os.path import join, exists, splitext
 import time
-from TA.helpers.helpers import read_reads, read_reference, pretty_print_aligned_reads_with_ref
+from M260B.helpers import read_reads, read_reference, pretty_print_aligned_reads_with_ref
 
 
 def hash_end(end, genome_ht):

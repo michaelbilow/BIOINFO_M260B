@@ -2,12 +2,11 @@ import sys
 import numpy as np
 from os.path import join
 import time
-from TA.helpers.helpers import read_reads, read_reference, pretty_print_aligned_reads_with_ref
+from M260B.helpers import read_reads, read_reference, pretty_print_aligned_reads_with_ref
 
 
 def trivial_algorithm(paired_end_reads, ref):
     """
-
     This is a functional aligner, but it's a huge simplification that
     generate a LOT of potential bugs.  It's also very slow.
 
