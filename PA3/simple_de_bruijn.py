@@ -2,25 +2,15 @@ from os.path import join
 import sys
 import time
 from collections import defaultdict, Counter
+from TA.helpers.helpers import read_reads
 
 
-def read_reads(read_fn):
-    f = open(read_fn, 'r')
-    first_line = True
-    all_reads = []
-    for line in f:
-        if first_line:
-            first_line = False
-            continue  # We skip the first line, since it
-            # only contains the name of the chromosome the reads
-            # came from.
-        line = line.strip()
-        reads = line.split(',')
-        # Only take the first read.
-        # Clearly, there is room for improvement here.
-        # Remember, the reads may be reversed. other end of the read is reversed relative ot the first.
-        all_reads += reads
-    return all_reads
+def read_assembly_reads(read_fn):
+    reads = read_reads(read_fn)
+    output_reads = [_[0] for _ in reads]
+    # Only taking one end of the read works okay, but
+    # this is an obvious area for improvement.
+    return output_reads
 
 
 def simple_de_bruijn(sequence_reads, k):
@@ -87,7 +77,7 @@ if __name__ == "__main__":
     chr_name = 'hw3all_A_3_chr_1'
     input_folder = './{}'.format(chr_name)
     reads_fn = join(input_folder, 'reads_{}.txt'.format(chr_name))
-    reads = read_reads(reads_fn)
+    reads = read_assembly_reads(reads_fn)
     db_graph = simple_de_bruijn(reads, 25)
     for k in db_graph.keys()[:40]:
         print k, db_graph[k]
