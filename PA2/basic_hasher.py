@@ -2,7 +2,7 @@ from collections import defaultdict, Counter
 import cPickle as pickle
 from os.path import join, exists, splitext
 import time
-from M260B.helpers import read_reads, read_reference, pretty_print_aligned_reads_with_ref
+from BIOINFO_M260B.helpers import read_reads, read_reference, pretty_print_aligned_reads_with_ref
 
 
 def hash_end(end, genome_ht):
@@ -96,6 +96,12 @@ def build_hash_and_pickle(ref_fn, key_length, force_rebuild=False):
 
 
 def hashing_algorithm(paired_end_reads, genome_ht):
+    """
+
+    :param paired_end_reads:
+    :param genome_ht:
+    :return:
+    """
     alignments = []
     genome_aligned_reads = []
     count = 0

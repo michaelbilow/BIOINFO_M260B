@@ -2,7 +2,7 @@ import sys
 import numpy as np
 from os.path import join
 import time
-from M260B.helpers import read_reads, read_reference, pretty_print_aligned_reads_with_ref
+from BIOINFO_M260B.helpers import read_reads, read_reference, pretty_print_aligned_reads_with_ref
 
 
 def trivial_algorithm(paired_end_reads, ref):
