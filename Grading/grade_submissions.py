@@ -3,13 +3,14 @@ from os import listdir
 from os.path import split, join, splitext
 import datetime
 import sys
+import numpy as np
 
 GRADED_GENOMES = {'hw1': 'PA1', 'hw2grad': 'PA2grad',
                   'hw3all': 'PA3', 'hw2undergrad': 'PA2ug'}
 
 
-CUTOFF_DATES_W16 = {'PA1': datetime.date(2016, 1, 15), 'PA2': datetime.date(2016, 2, 8),
-                    'PA3': datetime.date(2016, 2, 26), 'Final': datetime.date(2016, 3, 16)}
+CUTOFF_DATES_W16 = {'PA1': pd.Timestamp('2016-01-15'), 'PA2': pd.Timestamp('2016-02-08'),
+                    'PA3': pd.Timestamp('2016-02-26'), 'Final': pd.Timestamp('2016-03-16')}
 
 SCORE_CUTOFFS = {'PA1': {'snp': {'grad': 65, 'ug': 55, 'floor': 40}},
                  'PA2': {'snp': {'grad': 65, 'ug': 55, 'floor': 40},
@@ -35,16 +36,40 @@ def score_df(project, score_df):
     weights_dict = PROJECT_WEIGHTS[project]
     cutoff_date = CUTOFF_DATES_W16[project]
 
+    ug_scores = []
+    grad_scores = []
+    late_days = []
+
     for ix in score_df.index:
         row = score_df.ix[ix]
-        raw_score_dict = score_row(row, cutoff_dict, weights_dict, cutoff_date)
-        late_days = (row['upload_date'] - cutoff_date).days
-        max_row_score = compute_max_score(raw_score_dict, weights_dict)
+        raw_score_dict = score_row(row, cutoff_dict)
+        row_late_days = max((row['upload_date'] - cutoff_date).days, 0)
+        max_row_score_dict = compute_max_score(raw_score_dict, weights_dict)
+        ug_scores.append(max_row_score_dict['ug'])
+        grad_scores.append(max_row_score_dict['grad'])
+        late_days.append(row_late_days)
+
+    score_df['UG_RAW_SCORE'] = ug_scores
+    score_df['GRAD_RAW_SCORE'] = grad_scores
+    score_df['LATE_DAYS'] = late_days
+    score_df['UG_LATE_ADJUSTED'] = score_df['UG_RAW_SCORE'] - 3*score_df['LATE_DAYS']
+    score_df['GRAD_LATE_ADJUSTED'] = score_df['GRAD_RAW_SCORE'] - 3*score_df['LATE_DAYS']
+
+    output_dict = {'{}_{}'.format(grade_level, score_type):
+                   score_df['{}_{}'.format(grade_level, score_type)].max()
+                   for grade_level in ('UG', 'GRAD') for score_type in ('RAW_SCORE', 'LATE_ADJUSTED')}
+
+    output_dict['UG_LATE_DAYS'] = score_df.loc[score_df['UG_LATE_ADJUSTED'].idxmax(), 'LATE_DAYS']
+    output_dict['GRAD_LATE_DAYS'] = score_df.loc[score_df['GRAD_LATE_ADJUSTED'].idxmax(), 'LATE_DAYS']
+    print output_dict
+    print score_df
+    return output_dict
 
 
-def score_row(row, cutoff_dict, weights_dict, cutoff_date):
-    print row
-    print cutoff_dict
+
+def score_row(row, cutoff_dict):
+    # print row
+    # print cutoff_dict
     row_score_dict = {}
     for k in cutoff_dict:
         component_cutoff_dict = cutoff_dict[k]
@@ -55,8 +80,29 @@ def score_row(row, cutoff_dict, weights_dict, cutoff_date):
         ug_score = min(100.0, max(100 * float((raw_score - ug_max))/(ug_max - floor), 0.0))
         grad_score = min(100.0, max(100 * float((raw_score - grad_max))/(grad_max - floor), 0.0))
         row_score_dict[k] = {'ug': ug_score, 'grad': grad_score}
-        print row_score_dict
+    print row_score_dict
     return row_score_dict
+
+
+def compute_max_score(scores_dict, weights_dict_list):
+    score_lambda = lambda score_comps, grade_level, weights=None: \
+        np.average([scores_dict[score_component][grade_level] for score_component in score_comps], weights=weights)
+
+    if not weights_dict_list:
+        ## Take the average of all the scored components
+        print output_scores
+        return {grade_level: score_lambda(scores_dict.keys(), grade_level) for grade_level in ('ug', 'grad')}
+
+    potential_scores = []
+    for weights_dict in weights_dict_list:
+        these_scores = {grade_level: score_lambda(weights_dict.keys(), grade_level, weights_dict.values())
+                        for grade_level in ('ug', 'grad')}
+        potential_scores.append(these_scores)
+
+    output_scores = {grade_level: max([_[grade_level] for _ in potential_scores])
+                     for grade_level in ('ug', 'grad')}
+    print output_scores
+    return output_scores
 
 
 
