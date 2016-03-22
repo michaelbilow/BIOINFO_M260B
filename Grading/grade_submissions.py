@@ -58,11 +58,15 @@ def score_df(project, score_df):
     output_dict = {'{}_{}'.format(grade_level, score_type):
                    score_df['{}_{}'.format(grade_level, score_type)].max()
                    for grade_level in ('UG', 'GRAD') for score_type in ('RAW_SCORE', 'LATE_ADJUSTED')}
+    output_dict = {k: v if v > 0 else 0 for k,v in output_dict.items()}
 
     output_dict['UG_LATE_DAYS'] = score_df.loc[score_df['UG_LATE_ADJUSTED'].idxmax(), 'LATE_DAYS']
     output_dict['GRAD_LATE_DAYS'] = score_df.loc[score_df['GRAD_LATE_ADJUSTED'].idxmax(), 'LATE_DAYS']
-    print output_dict
-    print score_df
+    output_dict['PROJECT'] = project
+    assert len(set(score_df['project'])) == 1
+    output_dict['DATASET'] = score_df['project'].min()
+    # print output_dict
+    # print score_df
     return output_dict
 
 
@@ -90,8 +94,11 @@ def compute_max_score(scores_dict, weights_dict_list):
 
     if not weights_dict_list:
         ## Take the average of all the scored components
+        output_scores = {grade_level:
+                             score_lambda(scores_dict.keys(), grade_level)
+                         for grade_level in ('ug', 'grad')}
         print output_scores
-        return {grade_level: score_lambda(scores_dict.keys(), grade_level) for grade_level in ('ug', 'grad')}
+        return output_scores
 
     potential_scores = []
     for weights_dict in weights_dict_list:
@@ -131,9 +138,21 @@ if __name__ == "__main__":
         studentid, project = k
         if project.startswith('PA2'):
             project_score = score_df('PA2', g_df)
+            project_score['studentid'] = studentid
+            print project_score
             output_scores.append(project_score)
             final_project_score = score_df('Final', g_df)
+            final_project_score['studentid'] = studentid
+            print final_project_score
             output_scores.append(final_project_score)
+        else:
+            project_score = score_df(project, g_df)
+            project_score['studentid'] = studentid
+            print project_score
+            output_scores.append(project_score)
+
+    output_df = pd.DataFrame.from_records(output_scores)
+    output_df.to_excel('output_test.xlsx')
 
     # print df.columns
     # print df.head()
