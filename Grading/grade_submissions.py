@@ -34,17 +34,29 @@ def score_df(project, score_df):
     cutoff_dict = SCORE_CUTOFFS[project]
     weights_dict = PROJECT_WEIGHTS[project]
     cutoff_date = CUTOFF_DATES_W16[project]
-    if project == 'PA2':
-        other_output = score_df('Final', score_df)
-        pass
 
     for ix in score_df.index:
         row = score_df.ix[ix]
-        row_score = score_row(row, cutoff_dict, weights_dict, cutoff_date)
+        raw_score_dict = score_row(row, cutoff_dict, weights_dict, cutoff_date)
+        late_days = (row['upload_date'] - cutoff_date).days
+        max_row_score = compute_max_score(raw_score_dict, weights_dict)
 
 
 def score_row(row, cutoff_dict, weights_dict, cutoff_date):
-    
+    print row
+    print cutoff_dict
+    row_score_dict = {}
+    for k in cutoff_dict:
+        component_cutoff_dict = cutoff_dict[k]
+        floor = component_cutoff_dict['floor']
+        ug_max = component_cutoff_dict['ug']
+        grad_max = component_cutoff_dict['grad']
+        raw_score = row[k]
+        ug_score = min(100.0, max(100 * float((raw_score - ug_max))/(ug_max - floor), 0.0))
+        grad_score = min(100.0, max(100 * float((raw_score - grad_max))/(grad_max - floor), 0.0))
+        row_score_dict[k] = {'ug': ug_score, 'grad': grad_score}
+        print row_score_dict
+    return row_score_dict
 
 
 
@@ -61,14 +73,21 @@ if __name__ == "__main__":
     score_types = [GRADED_GENOMES[_] for _ in df['genome_type']]
     df['project'] = score_types
     df = df.ix[:, score_cols + ['user_id', 'project', 'upload_date']]
+    df.columns = [_.split('_')[0] if _.split('_')[-1] == 'score' else '_'.join(_.split('_')[1:]) if _.split('_')[0] == 'assembly' else _ for _ in df.columns]
 
 
     grouped = df.groupby(['user_id', 'project'])
 
-    for k, g in grouped:
-        print k
-        print g
-        sys.exit()
+    output_scores = []
+    for k, g_df in grouped:
+        # print k
+        # print g_df
+        studentid, project = k
+        if project.startswith('PA2'):
+            project_score = score_df('PA2', g_df)
+            output_scores.append(project_score)
+            final_project_score = score_df('Final', g_df)
+            output_scores.append(final_project_score)
 
     # print df.columns
     # print df.head()
