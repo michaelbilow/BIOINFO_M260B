@@ -49,16 +49,16 @@ def score_df(project, score_df):
         grad_scores.append(max_row_score_dict['grad'])
         late_days.append(row_late_days)
 
-    score_df['UG_RAW_SCORE'] = ug_scores
-    score_df['GRAD_RAW_SCORE'] = grad_scores
-    score_df['LATE_DAYS'] = late_days
-    score_df['UG_LATE_ADJUSTED'] = score_df['UG_RAW_SCORE'] - 3*score_df['LATE_DAYS']
-    score_df['GRAD_LATE_ADJUSTED'] = score_df['GRAD_RAW_SCORE'] - 3*score_df['LATE_DAYS']
+    score_df.ix[:, 'UG_RAW_SCORE'] = ug_scores
+    score_df.ix[:, 'GRAD_RAW_SCORE'] = grad_scores
+    score_df.ix[:, 'LATE_DAYS'] = late_days
+    score_df.ix[:, 'UG_LATE_ADJUSTED'] = score_df.ix[:, 'UG_RAW_SCORE'] - 3*score_df.ix[:, 'LATE_DAYS']
+    score_df.ix[:, 'GRAD_LATE_ADJUSTED'] = score_df.ix[:, 'GRAD_RAW_SCORE'] - 3*score_df.ix[:, 'LATE_DAYS']
 
     output_dict = {'{}_{}'.format(grade_level, score_type):
                    score_df['{}_{}'.format(grade_level, score_type)].max()
                    for grade_level in ('UG', 'GRAD') for score_type in ('RAW_SCORE', 'LATE_ADJUSTED')}
-    output_dict = {k: v if v > 0 else 0 for k,v in output_dict.items()}
+    output_dict = {k: v if v > 0 else 0 for k, v in output_dict.items()}
 
     output_dict['UG_LATE_DAYS'] = score_df.ix[score_df['UG_LATE_ADJUSTED'].idxmax(), 'LATE_DAYS']
     output_dict['GRAD_LATE_DAYS'] = score_df.ix[score_df['GRAD_LATE_ADJUSTED'].idxmax(), 'LATE_DAYS']

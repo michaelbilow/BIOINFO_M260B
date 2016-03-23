@@ -12,4 +12,5 @@ if __name__ == "__main__":
     print user_df.head()
     merged_df = pd.merge(grades_df, user_df, left_on=['studentid'], right_on=['user_data.user_id'])
     print merged_df.head()
-    merged_df.to_excel('testoutput2.xlsx')
+    merged_df.set_index(['UID', 'Grad', 'PROJECT', 'DATASET'], inplace=True)
+    merged_df.to_excel('testgrades.xlsx')
