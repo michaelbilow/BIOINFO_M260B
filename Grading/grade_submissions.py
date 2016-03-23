@@ -60,8 +60,8 @@ def score_df(project, score_df):
                    for grade_level in ('UG', 'GRAD') for score_type in ('RAW_SCORE', 'LATE_ADJUSTED')}
     output_dict = {k: v if v > 0 else 0 for k,v in output_dict.items()}
 
-    output_dict['UG_LATE_DAYS'] = score_df.loc[score_df['UG_LATE_ADJUSTED'].idxmax(), 'LATE_DAYS']
-    output_dict['GRAD_LATE_DAYS'] = score_df.loc[score_df['GRAD_LATE_ADJUSTED'].idxmax(), 'LATE_DAYS']
+    output_dict['UG_LATE_DAYS'] = score_df.ix[score_df['UG_LATE_ADJUSTED'].idxmax(), 'LATE_DAYS']
+    output_dict['GRAD_LATE_DAYS'] = score_df.ix[score_df['GRAD_LATE_ADJUSTED'].idxmax(), 'LATE_DAYS']
     output_dict['PROJECT'] = project
     assert len(set(score_df['project'])) == 1
     output_dict['DATASET'] = score_df['project'].min()
@@ -75,14 +75,18 @@ def score_row(row, cutoff_dict):
     # print row
     # print cutoff_dict
     row_score_dict = {}
+    print project
     for k in cutoff_dict:
         component_cutoff_dict = cutoff_dict[k]
         floor = component_cutoff_dict['floor']
         ug_max = component_cutoff_dict['ug']
         grad_max = component_cutoff_dict['grad']
         raw_score = row[k]
-        ug_score = min(100.0, max(100 * float((raw_score - ug_max))/(ug_max - floor), 0.0))
-        grad_score = min(100.0, max(100 * float((raw_score - grad_max))/(grad_max - floor), 0.0))
+        print k, raw_score,
+        ug_score = min(100.0, max(100 * float((raw_score - floor))/(ug_max - floor), 0.0))
+        grad_score = min(100.0, max(100 * float((raw_score - floor))/(grad_max - floor), 0.0))
+        if raw_score == 82.95 and thisproject == 'Final':
+            pass
         row_score_dict[k] = {'ug': ug_score, 'grad': grad_score}
     print row_score_dict
     return row_score_dict
@@ -112,7 +116,6 @@ def compute_max_score(scores_dict, weights_dict_list):
     return output_scores
 
 
-
 if __name__ == "__main__":
     input_folder = './submissions'
     input_fn = join(input_folder, listdir(input_folder)[0])
@@ -137,10 +140,12 @@ if __name__ == "__main__":
         # print g_df
         studentid, project = k
         if project.startswith('PA2'):
+            thisproject = 'PA2'
             project_score = score_df('PA2', g_df)
             project_score['studentid'] = studentid
             print project_score
             output_scores.append(project_score)
+            thisproject = 'Final'
             final_project_score = score_df('Final', g_df)
             final_project_score['studentid'] = studentid
             print final_project_score
