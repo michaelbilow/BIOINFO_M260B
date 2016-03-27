@@ -85,8 +85,6 @@ def score_row(row, cutoff_dict):
         print k, raw_score,
         ug_score = min(100.0, max(100 * float((raw_score - floor))/(ug_max - floor), 0.0))
         grad_score = min(100.0, max(100 * float((raw_score - floor))/(grad_max - floor), 0.0))
-        if raw_score == 82.95 and thisproject == 'Final':
-            pass
         row_score_dict[k] = {'ug': ug_score, 'grad': grad_score}
     print row_score_dict
     return row_score_dict
@@ -119,7 +117,7 @@ def compute_max_score(scores_dict, weights_dict_list):
 if __name__ == "__main__":
     input_folder = './submissions'
     input_fn = join(input_folder, listdir(input_folder)[0])
-    df = pd.read_excel(input_fn)
+    df = pd.read_csv(input_fn)
     df.columns = [_.split('.')[1] for _ in df.columns]
 
     df['upload_date'] = pd.to_datetime(df['upload_date'])
