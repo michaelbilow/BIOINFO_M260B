@@ -8,7 +8,6 @@ import numpy as np
 GRADED_GENOMES = {'hw1': 'PA1', 'hw2grad': 'PA2grad',
                   'hw3all': 'PA3', 'hw2undergrad': 'PA2ug'}
 
-
 CUTOFF_DATES_W16 = {'PA1': pd.Timestamp('2016-01-15'), 'PA2': pd.Timestamp('2016-02-08'),
                     'PA3': pd.Timestamp('2016-02-26'), 'Final': pd.Timestamp('2016-03-16')}
 
@@ -20,9 +19,9 @@ SCORE_CUTOFFS = {'PA1': {'snp': {'grad': 65, 'ug': 55, 'floor': 40}},
                          'contig_sizes': {'grad': 4, 'ug': 2, 'floor': 0}},
                  'Final': {'snp': {'grad': 90, 'ug': 75, 'floor': 55},
                            'indel': {'grad': 50, 'ug': 30, 'floor': 15},
-                           'str': {'grad': 90, 'ug': 65, 'floor': 40},
-                           'inversion': {'grad': 20, 'ug': 10, 'floor': 0},
-                           'copynumber': {'grad': 20, 'ug': 10, 'floor': 0}}
+                           'str': {'grad': 70, 'ug': 65, 'floor': 40},  ## For future, raise the grad standard up to 80.
+                           'inversion': {'grad': 20, 'ug': 20, 'floor': 0},
+                           'copynumber': {'grad': 60, 'ug': 10, 'floor': 0}}
                  }
 
 PROJECT_WEIGHTS = {'PA1': [],
@@ -52,11 +51,11 @@ def score_df(project, score_df):
     score_df.ix[:, 'UG_RAW_SCORE'] = ug_scores
     score_df.ix[:, 'GRAD_RAW_SCORE'] = grad_scores
     score_df.ix[:, 'LATE_DAYS'] = late_days
-    score_df.ix[:, 'UG_LATE_ADJUSTED'] = score_df.ix[:, 'UG_RAW_SCORE'] - 3*score_df.ix[:, 'LATE_DAYS']
-    score_df.ix[:, 'GRAD_LATE_ADJUSTED'] = score_df.ix[:, 'GRAD_RAW_SCORE'] - 3*score_df.ix[:, 'LATE_DAYS']
+    score_df.ix[:, 'UG_LATE_ADJUSTED'] = score_df.ix[:, 'UG_RAW_SCORE'] - 3 * score_df.ix[:, 'LATE_DAYS']
+    score_df.ix[:, 'GRAD_LATE_ADJUSTED'] = score_df.ix[:, 'GRAD_RAW_SCORE'] - 3 * score_df.ix[:, 'LATE_DAYS']
 
     output_dict = {'{}_{}'.format(grade_level, score_type):
-                   score_df['{}_{}'.format(grade_level, score_type)].max()
+                       score_df['{}_{}'.format(grade_level, score_type)].max()
                    for grade_level in ('UG', 'GRAD') for score_type in ('RAW_SCORE', 'LATE_ADJUSTED')}
     output_dict = {k: v if v > 0 else 0 for k, v in output_dict.items()}
 
@@ -68,7 +67,6 @@ def score_df(project, score_df):
     # print output_dict
     # print score_df
     return output_dict
-
 
 
 def score_row(row, cutoff_dict):
@@ -83,8 +81,8 @@ def score_row(row, cutoff_dict):
         grad_max = component_cutoff_dict['grad']
         raw_score = row[k]
         print k, raw_score,
-        ug_score = min(100.0, max(100 * float((raw_score - floor))/(ug_max - floor), 0.0))
-        grad_score = min(100.0, max(100 * float((raw_score - floor))/(grad_max - floor), 0.0))
+        ug_score = min(100.0, max(100 * float((raw_score - floor)) / (ug_max - floor), 0.0))
+        grad_score = min(100.0, max(100 * float((raw_score - floor)) / (grad_max - floor), 0.0))
         row_score_dict[k] = {'ug': ug_score, 'grad': grad_score}
     print row_score_dict
     return row_score_dict
@@ -127,8 +125,9 @@ if __name__ == "__main__":
     score_types = [GRADED_GENOMES[_] for _ in df['genome_type']]
     df['project'] = score_types
     df = df.ix[:, score_cols + ['user_id', 'project', 'upload_date']]
-    df.columns = [_.split('_')[0] if _.split('_')[-1] == 'score' else '_'.join(_.split('_')[1:]) if _.split('_')[0] == 'assembly' else _ for _ in df.columns]
-
+    df.columns = [_.split('_')[0] if _.split('_')[-1] == 'score' else '_'.join(_.split('_')[1:]) if _.split('_')[
+                                                                                                        0] == 'assembly' else _
+                  for _ in df.columns]
 
     grouped = df.groupby(['user_id', 'project'])
 
@@ -164,4 +163,3 @@ if __name__ == "__main__":
     # print set(df['chromosome_id'])
     # print set(df['genome_type'])
     # grouped = df.groupby()
-
