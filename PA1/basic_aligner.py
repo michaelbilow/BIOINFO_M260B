@@ -77,7 +77,7 @@ def trivial_algorithm(paired_end_reads, ref):
 
 
 if __name__ == "__main__":
-    data_folder = 'hw1_W_2'
+    data_folder = 'practice_W_1'
     input_folder = join('../data/', data_folder)
     f_base = '{}_chr_1'.format(data_folder)
     reads_fn = join(input_folder, 'reads_{}.txt'.format(f_base))
