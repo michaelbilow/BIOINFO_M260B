@@ -1,5 +1,4 @@
 *.pyc
 Exams/*
 Grading/*/*
-data/*
 *.xlsx
