@@ -2,6 +2,10 @@ from collections import defaultdict, Counter
 import cPickle as pickle
 from os.path import join, exists, splitext
 import time
+import os
+import sys
+sys.path.insert(0, os.path.abspath(".."))
+sys.path.insert(0, os.path.abspath("../.."))
 from BIOINFO_M260B.helpers import read_reads, read_reference, pretty_print_aligned_reads_with_ref
 
 

@@ -4,7 +4,10 @@ from collections import defaultdict
 import time
 from os.path import join
 from basic_hasher import build_hash_and_pickle, hashing_algorithm
-from helpers.helpers import *
+import os
+sys.path.insert(0, os.path.abspath(".."))
+sys.path.insert(0, os.path.abspath("../.."))
+from BIOINFO_M260B.helpers import *
 
 READ_LENGTH = 50
 
