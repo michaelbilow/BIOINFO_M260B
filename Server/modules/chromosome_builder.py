@@ -4,6 +4,7 @@ Created on June 20, 2014
 @author: Joseph Korpela
 """
 
+from __future__ import absolute_import
 import mmap
 import random
 import sys
