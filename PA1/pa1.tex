@@ -21,7 +21,32 @@ This short programming assignment is designed to help you get an
 understanding for the basics of sequence alignment. You can use any language
 for this project, but Python is strongly recommended, and you will receive starter code in Python. You will submit your response to \url{https://cm124.herokuapp.com/upload} as a \textbf{.zip} file.
 
-\section*{Start Here}
+\section*{Overview}
+In the first two programming assignments for this class, you will solve the computational problem of re-sequencing, which is the process of inferring a donor genome based on reads and a reference. 
+
+You are given a reference genome in FASTA format, and paired-end reads.
+
+The first line of each file indicates which project that the data relates to. In the reference file, the genome is written in order, 80 bases (A's, C's, G's, and T's) per line.
+
+The paired end reads are generated from the unknown donor sequence, and 10 percent of the reads are generated randomly to mimic contamination with another genetic source. These reads are formatted as two 50 bp-long ends, which are separated by a 90-110 bp-long separator. 
+
+\section*{Starter Code}
+
+Starter code for the project is available at \url{https://github.com/michaelbilow/BIOINFO_M260B}. It is strongly recommended that you use git for these programming assignments, and to set up your own account on github.com. The tutorial at \url{https://try.github.io/levels/1/challenges/1} is short and excellent.
+
+Create a branch for you to work on PA1 with, for example with \verb!git branch pa1 && git checkout pa1!. This will allow you to save your work and still be able to update your code from my master branch.
+
+Go into the PA1 folder and run \verb!python basic_aligner.py! If you are on the current master branch, this should produce output, however it takes about a half hour to run on my machine.
+
+Read the content of PA1, and see if you can understand what it is doing. You should also look to see where your input/output is going to go. This will generate an alignment file in the data folder from which it was executed. Read over the alignment file and see how it works.
+
+Run \verb|python basic_pileup.py|. This will generate three files; a consensus sequence, a text file correctly-formatted for submission on the herokuapp site, and a zipped version of that file.
+
+Download the data from CCLE, and edit the functions in \verb|basic_aligner.py| and 
+\verb|basic_pileup.py|. The warmup sets include a donor genome (i.e. the genome from which the reads were generated), and an answer set that you can use 
+You can submit your results as many times as you want to achieve a passing score.
+
+\section*{I/O Details}
 \url{https://cm124.herokuapp.com/ans_file_doc} should handle most of your questions on reading and writing output.
 
 \section*{Sequence Alignment}
@@ -64,6 +89,8 @@ The genome from which the reads are generated has not only SNPs, but insertions,
 What will these non-SNP mutations look like when you try to align them to the genome? Try writing it out on a piece of paper. 
 
 More generally, what is the "signature" of a SNP mismatch in the consensus sequence?  What is the "signature" of an insertion or deletion?
+
+
 
 
 \section*{Grading}
