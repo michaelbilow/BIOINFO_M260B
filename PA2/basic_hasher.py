@@ -125,7 +125,7 @@ def hashing_algorithm(paired_end_reads, genome_ht):
 
 if __name__ == "__main__":
     genome_name = 'practice_W_1'
-    input_folder = './{}'.format(genome_name)
+    input_folder = '../data/{}'.format(genome_name)
     chr_name = '{}_chr_1'.format(genome_name)
     reads_fn_end = 'reads_{}.txt'.format(chr_name)
     reads_fn = join(input_folder, reads_fn_end)
